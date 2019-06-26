@@ -1,26 +1,33 @@
+//dotenv package
 require("dotenv").config();
+//safe key
 var keys = require("./keys.js");
-
+//spotify api / package
 var Spotify = require('node-spotify-api');
+//creating an instance of Spotify object with the keys.
 var spotify = new Spotify(keys.spotify);
 
+//moment package
 var moment = require('moment');
+// fs package
 var fs = require('fs');
-
+// taking in the command 
 var command = process.argv[2];
 //var name = process.argv[3];
 var nameArr = [];
+//name variable.
 var name = "";
-
+// axios package
 const axios = require('axios');
-
+// if user inputs concert-this
 if (command == "concert-this") {
+    //join the words into one
     for (var i = 3; i < process.argv.length; i++){
         nameArr.push(process.argv[i]);
     }
     
     name = nameArr.join('%20');
-    //console.log(name);
+    //using axios to make a request to bandsintown
     axios.get("https://rest.bandsintown.com/artists/" + name + "/events?app_id=codingbootcamp")
         .then(function (response) {
             console.log(response.data[0].venue.name); // ex.: { user: 'Your User'}
@@ -32,12 +39,15 @@ if (command == "concert-this") {
             console.log(error);
         });
 }
+// if user inputs spotify-this-song
 else if (command == "spotify-this-song") {
+        //join the words into one
     for (var i = 3; i < process.argv.length; i++) {
         nameArr.push(process.argv[i]);
     }
 
     name = nameArr.join(' ');
+    //spotify search
     spotify.search({ type: 'track', query: name }, function (err, data) {
         if (err) {
             return console.log('Error occurred: ' + err);
@@ -49,13 +59,16 @@ else if (command == "spotify-this-song") {
         console.log("Album Name: " + data.tracks.items[0].album.name);
     });
 }
+// if user inputs movie-this
 else if (command == "movie-this") {
+        //join the words into one
     for (var i = 3; i < process.argv.length; i++) {
         nameArr.push(process.argv[i]);
     }
 
     name = nameArr.join(' ');
 
+    //using axios to make a request
     axios.get("http://www.omdbapi.com/?apikey=trilogy&t=" + name)
         .then(function (response) {
             console.log("Movie name: " + name);
@@ -72,12 +85,13 @@ else if (command == "movie-this") {
             console.log(error);
         });
 }
-
+// if user inputs do-what-it-says
 else if (command == "do-what-it-says") {
+    //read from random.txt
     fs.readFile('./random.txt', 'utf8', function(err, data) {
         if (err) throw err;
         name = data.split(",");
-        console.log(name[1]);
+        //spotify search
         spotify.search({ type: 'track', query: name[1] }, function (err, data) {
             if (err) {
                 return console.log('Error occurred: ' + err);
